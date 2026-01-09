@@ -1,12 +1,12 @@
 :root {
-  --bg: #0e1116;
-  --bg-glow: #1c2430;
-  --gold: #f0c763;
-  --gold-deep: #b5852b;
-  --ink: #e8ecf4;
-  --muted: #9aa3b2;
-  --card: rgba(10, 12, 16, 0.62);
-  --line: rgba(240, 199, 99, 0.25);
+  --bg: #2c0c0c;
+  --bg-glow: #4b0f12;
+  --gold: #f4c56d;
+  --gold-deep: #c08a2f;
+  --ink: #fff5e6;
+  --muted: #e0c7a5;
+  --card: rgba(28, 7, 9, 0.65);
+  --line: rgba(244, 197, 109, 0.25);
 }
 
 * {
@@ -16,12 +16,12 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Noto Serif SC", serif;
   color: var(--ink);
   background:
-    radial-gradient(1200px 700px at 10% 10%, rgba(240, 199, 99, 0.22), transparent 60%),
-    radial-gradient(900px 500px at 85% 20%, rgba(94, 148, 255, 0.12), transparent 60%),
-    linear-gradient(160deg, var(--bg) 0%, #0a0b10 40%, var(--bg-glow) 100%);
+    radial-gradient(900px 600px at 15% 10%, rgba(244, 197, 109, 0.25), transparent 60%),
+    radial-gradient(800px 520px at 85% 25%, rgba(255, 129, 84, 0.18), transparent 60%),
+    linear-gradient(160deg, var(--bg) 0%, #1b0708 45%, var(--bg-glow) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,24 +34,24 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    radial-gradient(rgba(240, 199, 99, 0.08) 1px, transparent 1px);
-  background-size: 48px 48px, 120px 120px;
-  background-position: 0 0, 30px 40px;
+    linear-gradient(120deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(rgba(244, 197, 109, 0.08) 1px, transparent 1px);
+  background-size: 54px 54px, 140px 140px;
+  background-position: 0 0, 20px 30px;
   mix-blend-mode: screen;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 main {
   width: min(980px, 100%);
   background: var(--card);
   border: 1px solid var(--line);
-  box-shadow: 0 40px 80px rgba(4, 6, 10, 0.65);
+  box-shadow: 0 40px 90px rgba(10, 4, 5, 0.65);
   backdrop-filter: blur(12px);
   border-radius: 24px;
   padding: clamp(24px, 4vw, 42px);
   display: grid;
-  gap: 24px;
+  gap: 26px;
 }
 
 header {
@@ -76,34 +76,139 @@ h1 {
   animation: rise 0.8s ease-out 0.1s both;
 }
 
-.ascii-frame {
+.subtitle-link {
+  color: rgba(244, 197, 109, 0.9);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(244, 197, 109, 0.4);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.subtitle-link:hover {
+  color: rgba(255, 230, 170, 0.95);
+  border-color: rgba(255, 230, 170, 0.7);
+}
+
+.hero {
   border-radius: 18px;
-  padding: 18px;
-  background: rgba(6, 8, 12, 0.6);
+  padding: clamp(18px, 3vw, 28px);
+  background:
+    linear-gradient(145deg, rgba(67, 18, 18, 0.7), rgba(26, 8, 10, 0.8)),
+    radial-gradient(340px 220px at 15% 20%, rgba(244, 197, 109, 0.2), transparent 70%);
   border: 1px solid rgba(240, 199, 99, 0.2);
   position: relative;
   overflow: hidden;
 }
 
-.ascii-frame::after {
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 20px;
+  border: 1px solid rgba(244, 197, 109, 0.2);
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+.hero::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent 30%, rgba(240, 199, 99, 0.15), transparent 70%);
-  animation: sweep 7s ease-in-out infinite;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(244, 197, 109, 0.04) 0,
+      rgba(244, 197, 109, 0.04) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-pre {
+.ascii-hero {
+  position: absolute;
+  inset: 0;
+  padding: 22px 18px 14px;
   margin: 0;
-  font-family: "Space Mono", monospace;
-  font-size: clamp(12px, 1.4vw, 16px);
-  line-height: 1.2;
-  color: #f3d98c;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(244, 197, 109, 0.22);
   white-space: pre;
-  letter-spacing: 0.12em;
-  min-height: 260px;
+  line-height: 1.1;
+  pointer-events: none;
+  user-select: none;
+  mix-blend-mode: normal;
+}
+
+.hero-grid {
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr minmax(120px, 180px);
+  gap: clamp(16px, 3vw, 28px);
+  align-items: center;
+}
+
+.medallion {
+  width: clamp(120px, 16vw, 180px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, #ffe4a6, #f3c165 55%, #b8791f 100%);
+  border: 2px solid rgba(255, 244, 220, 0.6);
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 0 24px rgba(92, 45, 12, 0.4);
+}
+
+.medallion-mark {
+  font-family: "Ma Shan Zheng", cursive;
+  font-size: clamp(28px, 4vw, 46px);
+  color: rgba(87, 34, 9, 0.85);
+  letter-spacing: 0.1em;
+}
+
+.hero-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.kicker {
+  font-size: 14px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.brand {
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.tagline {
+  font-size: clamp(14px, 2vw, 18px);
+  color: rgba(255, 235, 205, 0.85);
+}
+
+.seal-block {
+  border-left: 1px solid rgba(244, 197, 109, 0.35);
+  padding-left: clamp(12px, 2vw, 18px);
+}
+
+.seal-title {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(244, 197, 109, 0.7);
+  margin-bottom: 10px;
+}
+
+.seal-lines {
+  display: grid;
+  gap: 6px;
+  font-size: 16px;
 }
 
 .cta {
@@ -111,6 +216,8 @@ pre {
   flex-wrap: wrap;
   gap: 12px 18px;
   align-items: center;
+  padding-top: 18px;
+  border-top: 1px solid rgba(244, 197, 109, 0.2);
 }
 
 .pill {
@@ -123,8 +230,13 @@ pre {
   color: var(--ink);
   text-decoration: none;
   font-size: 16px;
-  background: rgba(16, 18, 24, 0.4);
+  background: rgba(43, 13, 13, 0.55);
   transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.pill .icon {
+  width: 18px;
+  height: 18px;
 }
 
 .pill:hover {
@@ -135,6 +247,7 @@ pre {
 .note {
   font-size: 15px;
   color: var(--muted);
+  max-width: 46ch;
 }
 
 @keyframes sweep {
@@ -161,7 +274,17 @@ pre {
 }
 
 @media (max-width: 720px) {
-  pre {
-    letter-spacing: 0.08em;
+  .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .medallion {
+    margin: 0 auto;
+  }
+
+  .seal-block {
+    border-left: none;
+    padding-left: 0;
   }
 }

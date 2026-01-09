@@ -1,108 +1,103 @@
 import "./style.css";
 
-const pre = document.getElementById("ascii");
-const word = "JoyC.ai";
-const charSet = word.split("");
-const coins = [];
-let cols = 80;
-let rows = 24;
-let lastSpawn = 0;
-let charWidth = 10;
-let charHeight = 18;
+const asciiHero = document.getElementById("ascii-hero");
+const glyphs = "JoyC.ai";
+const glyphPattern = `${glyphs}    `;
+let tick = 0;
+let cols = 60;
+let rows = 18;
+let charWidth = 18;
+let charHeight = 20;
+let yOffset = 0.08;
+let intervalId = null;
+let isVisible = true;
+const frameDelay = 260;
 
-function measureChar() {
+function measureHeroGrid() {
+  if (!asciiHero || !asciiHero.parentElement) return;
   const probe = document.createElement("span");
-  probe.textContent = "M";
+  const sampleCount = 12;
+  probe.textContent = "M".repeat(sampleCount);
   probe.style.position = "absolute";
   probe.style.visibility = "hidden";
-  probe.style.fontFamily = "Space Mono, monospace";
-  probe.style.fontSize = getComputedStyle(pre).fontSize;
+  probe.style.fontFamily = "IBM Plex Mono, monospace";
+  const computedHero = getComputedStyle(asciiHero);
+  probe.style.fontSize = computedHero.fontSize;
+  probe.style.letterSpacing = computedHero.letterSpacing;
   document.body.appendChild(probe);
   const rect = probe.getBoundingClientRect();
-  charWidth = rect.width || 10;
-  charHeight = rect.height || 18;
   probe.remove();
+  const letterSpacing =
+    computedHero.letterSpacing === "normal"
+      ? 0
+      : parseFloat(computedHero.letterSpacing || "0");
+  const totalSpacing = letterSpacing * (sampleCount - 1);
+  charWidth = rect.width
+    ? (rect.width - totalSpacing) / sampleCount
+    : 8;
+  charHeight = rect.height || 14;
+
+  const computed = computedHero;
+  const paddingX =
+    parseFloat(computed.paddingLeft || "0") +
+    parseFloat(computed.paddingRight || "0");
+  const paddingY =
+    parseFloat(computed.paddingTop || "0") +
+    parseFloat(computed.paddingBottom || "0");
+  const rectHero = asciiHero.getBoundingClientRect();
+  const availableWidth = (rectHero.width || 600) - paddingX;
+  const availableHeight = (rectHero.height || 240) - paddingY;
+  cols = Math.max(36, Math.floor(availableWidth / charWidth - 0.2));
+  rows = Math.max(12, Math.floor(availableHeight / charHeight - 0.2));
 }
 
-function resize() {
-  measureChar();
-  const frame = pre.parentElement;
-  cols = Math.max(42, Math.floor(frame.clientWidth / charWidth));
-  rows = Math.max(16, Math.floor(frame.clientHeight / charHeight));
+function inDollar(x, y, t) {
+  const warp = Math.sin(t * 0.4 + y * 3) * 0.025;
+  const xShift = x + warp;
+  const sCurve = 0.68 * Math.sin(Math.PI * y);
+  const sStroke = Math.abs(xShift - sCurve) < 0.16;
+  const bar = Math.abs(xShift) < 0.12 && Math.abs(y) < 1.08;
+  const topBar = Math.abs(y - 0.6) < 0.12 && Math.abs(xShift) < 0.75;
+  const bottomBar = Math.abs(y + 0.6) < 0.12 && Math.abs(xShift) < 0.75;
+  return sStroke || bar || topBar || bottomBar;
 }
 
-function spawnCoin(now) {
-  if (now - lastSpawn < 320) return;
-  lastSpawn = now;
-  coins.push({
-    x: Math.random() * cols,
-    y: -2,
-    vy: 0.15 + Math.random() * 0.25,
-    drift: (Math.random() - 0.5) * 0.06,
-    phase: Math.random() * Math.PI * 2,
-  });
-}
-
-function setCell(grid, x, y, value) {
-  if (x < 0 || x >= cols || y < 0 || y >= rows) return;
-  grid[y][x] = value;
-}
-
-function render(now) {
-  const t = now * 0.001;
-  spawnCoin(now);
-
-  const grid = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => " ")
-  );
-
-  for (let y = 0; y < rows; y += 1) {
-    for (let x = 0; x < cols; x += 1) {
-      const ripple =
-        Math.sin(x * 0.16 + t * 0.9) + Math.cos(y * 0.22 - t * 0.6);
-      if (ripple > 1.35) {
-        const idx = Math.abs((x + y + Math.floor(t * 3)) % charSet.length);
-        setCell(grid, x, y, charSet[idx]);
+function renderHeroAscii() {
+  if (!asciiHero) return;
+  if (!isVisible) return;
+  tick += 1;
+  const t = tick * 0.08;
+  const lines = [];
+  for (let row = 0; row < rows; row += 1) {
+    let line = "";
+    const y = (row / (rows - 1)) * 2.2 - 1.1 + yOffset;
+    for (let col = 0; col < cols; col += 1) {
+      const x = (col / (cols - 1)) * 2.2 - 1.1;
+      if (inDollar(x, y, t)) {
+        const idx = (col + row + tick) % glyphPattern.length;
+        line += glyphPattern[idx];
+      } else {
+        line += " ";
       }
     }
+    lines.push(line);
   }
-
-  const center = rows * 0.5;
-  const amp = rows * 0.18;
-  const scroll = t * 6;
-  const spacing = word.length + 6;
-
-  for (let baseX = -spacing * 2; baseX < cols + spacing * 2; baseX += spacing) {
-    for (let i = 0; i < word.length; i += 1) {
-      const x = Math.floor(baseX + i + (scroll % spacing));
-      const y =
-        Math.round(
-          center +
-            Math.sin(x * 0.32 + t * 1.6) * amp * 0.7 +
-            Math.sin(t * 0.7) * 1.5
-        );
-      setCell(grid, x, y, word[i]);
-      setCell(grid, x, y - 1, ".");
-      setCell(grid, x, y + 1, ".");
-    }
-  }
-
-  for (const coin of coins) {
-    coin.y += coin.vy;
-    coin.x += Math.sin(t * 1.4 + coin.phase) * 0.06 + coin.drift;
-    setCell(grid, Math.round(coin.x), Math.round(coin.y), "o");
-    setCell(grid, Math.round(coin.x) + 1, Math.round(coin.y), ".");
-  }
-
-  for (let i = coins.length - 1; i >= 0; i -= 1) {
-    if (coins[i].y > rows + 2) coins.splice(i, 1);
-  }
-
-  const lines = grid.map((row) => row.join("")).join("\n");
-  pre.textContent = lines;
-  requestAnimationFrame(render);
+  asciiHero.textContent = lines.join("\n");
 }
 
-window.addEventListener("resize", resize);
-resize();
-requestAnimationFrame(render);
+measureHeroGrid();
+renderHeroAscii();
+window.addEventListener("resize", () => {
+  measureHeroGrid();
+  renderHeroAscii();
+});
+document.addEventListener("visibilitychange", () => {
+  isVisible = document.visibilityState === "visible";
+});
+intervalId = setInterval(renderHeroAscii, frameDelay);
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    if (intervalId) clearInterval(intervalId);
+  });
+}
